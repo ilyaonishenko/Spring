@@ -1,10 +1,95 @@
+<!DOCTYPE html>
 <html>
-<body>
-	<form method="POST" enctype="multipart/form-data"
-		action="/upload">
-		File to upload: <input type="file" name="file"><br /> Name: <input
-			type="text" name="name"><br /> <br /> <input type="submit"
-			value="Upload"> Press here to upload the file!
-	</form>
-</body>
+	<head>
+		<meta charset="utf-8"></meta>
+		<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+		<style type="text/css">
+			body {
+				text-align: center;
+			}
+
+			#dropZone {
+				max-width: 700px;
+				margin: 0 auto;
+				min-height: 100px;
+				overflow: auto;
+				border: solid 1px black;
+			}
+
+			.tile {
+				width: 100px;
+				height: 100px;
+				float: left;
+				padding: 5px;
+			}
+
+			.image-container {
+				border: solid 1px black;
+				width: 100%;
+				height: 100%;
+				position: relative;
+			}
+
+			.portrait {
+				height: 100%;
+			}
+
+			.landscape {
+				width: 100%;
+			}
+
+			.delete-button {
+				position: absolute;
+				top: 2px;
+				right: 2px;
+				cursor: pointer;
+			}
+
+			#fileInput {
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div>
+			<div id="dropZone"  enctype="multipart/form-data"  ondragover="onDragOver(event)" ondrop="onDrop(event)"></div>
+			<button method="POST" enctype="multipart/form-data" action="/upload" onclick="selectFiles()">Выберите файлы</button>
+			<input id="fileInput" onchange="processFiles(this.files)" type="file" multiple />
+		</div>
+		<script>
+			function deleteImage(e){
+				var element = $(e);
+
+				console.log(element.data("uuid"));
+				element.closest(".tile").remove();
+			}
+			function selectFiles(){
+				$("#fileInput").trigger('click');
+			}
+			function onDragOver(e){
+				e.preventDefault();
+			}
+			function processFiles(files){
+				$.each(files, function(){
+					var reader = new FileReader();
+					reader.onload = function (e) {
+						var tile = $("<div class='tile'><div class='image-container'></div></div>");
+						$("#dropZone").append(tile);
+						setTimeout(function(){
+							var img = $("<img src='" + e.target.result + "'/>");
+							$(".image-container", tile)
+								.append(img)
+								.append("<span onClick='deleteImage(this)' data-uuid='" + Math.random() + "' class='delete-button'>X</span>");
+							img.addClass(img.width() / img.height() > 1 ? 'landscape' : 'portrait');
+						}, Math.random() * 5000);
+					}
+					reader.readAsDataURL(this);
+				});
+			}
+			function onDrop(e){
+				e.preventDefault();
+				processFiles(e.dataTransfer.files);
+			}
+		</script>
+	</body>
 </html>
