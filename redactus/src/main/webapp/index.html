@@ -1,0 +1,110 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>My Uploadings</title>
+<script src="js/jquery.1.9.1.min.js"></script>
+
+<script src="js/vendor/jquery.ui.widget.js"></script>
+<script src="js/jquery.iframe-transport.js"></script>
+<script src="js/jquery.fileupload.js"></script>
+
+<!-- bootstrap just to have good looking page -->
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<link href="bootstrap/css/bootstrap.css" type="text/css" rel="stylesheet" />
+
+<!-- we code these -->
+<!--<link href="css/dropzone.css" type="text/css" rel="stylesheet" />-->
+<script src="js/myuploadfunction.js"></script>
+<style type="text/css">
+	body {
+		text-align: center;
+	}
+	#dropzone {
+		max-width: 700px;
+		margin: 0 auto;
+		min-height: 100px;
+		overflow: auto;
+		border: solid 1px black;
+	}
+	.tile {
+		width: 100px;
+		height: 100px;
+		float: left;
+		padding: 5px;
+	}
+	.image-container {
+		border: solid 1px black;
+		width: 100%;
+		height: 100%;
+		position: relative;
+	}
+	.portrait {
+		height: 100%;
+	}
+
+	.landscape {
+		width: 100%;
+	}
+	.delete-button {
+		position: absolute;
+		top: 2px;
+		right: 2px;
+		cursor: pointer;
+	}
+	#file {
+		display: none;
+	}
+</style>
+</head>
+<body>
+GRACHEV HUY
+<form method="POST" enctype="multipart/form-data">
+<div>
+	<div>
+	<div id="dropzone" ondragover="onDragOver(event)" ondrop="onDrop(event)"></div>
+	<input id="fileupload" onchange="processFiles(this.files)" type="file" name="files[]" data-url="rest/controller/upload" multiple>
+	</div>
+</div>
+<div id="progress" class="progress">
+	<div class="bar" style="width: 0%;"></div>
+</div>
+</form>
+<script>
+	function deleteImage(e){
+		var element = $(e);
+
+		console.log(element.data("uuid"));
+		element.closest(".tile").remove();
+	}
+	function selectFiles(){
+		$("#fileInput").trigger('click');
+	}
+	function onDragOver(e){
+		e.preventDefault();
+	}
+	function processFiles(files){
+		$.each(files, function(){
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				var tile = $("<div class='tile'><div class='image-container'></div></div>");
+				$("#dropzone").append(tile);
+				setTimeout(function(){
+					var img = $("<img src='" + e.target.result + "'/>");
+					$(".image-container", tile)
+						.append(img)
+						.append("<span onClick='deleteImage(this)' data-uuid='" + Math.random() + "' class='delete-button'>X</span>");
+					img.addClass(img.width() / img.height() > 1 ? 'landscape' : 'portrait');
+				}, Math.random() * 5000);
+			}
+			reader.readAsDataURL(this);
+		});
+	}
+	function onDrop(e){
+		e.preventDefault();
+		processFiles(e.dataTransfer.files);
+	}
+</script>
+IVANONVA SUKA
+</body>
+</html>
