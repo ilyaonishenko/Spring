@@ -2,13 +2,10 @@ package com.redactus.model;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @JsonIgnoreProperties({"bytes"})
 public class FileMeta {
-
 	private String fileName;
 	private String fileSize;
 	private String fileType;
-
 	private byte[] bytes;
-
 	public String getFileName() {
 		return fileName;
 	}
