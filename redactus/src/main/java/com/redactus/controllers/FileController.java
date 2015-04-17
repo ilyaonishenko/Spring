@@ -25,6 +25,7 @@ public class FileController {
 		 MultipartFile mpf = null;
 		 while(itr.hasNext()){
 			 mpf = request.getFile(itr.next());
+			if(check(mpf.getOriginalFilename())){
 			 System.out.println(mpf.getOriginalFilename() +" uploaded! "+files.size());
 			 if(files.size() >= 10)
 				 files.pop();
@@ -40,7 +41,10 @@ public class FileController {
 				e.printStackTrace();
 			}
 			 files.add(fileMeta);
-		 }
+		 } else{
+			System.out.println(mpf.getOriginalFilename()+" is not real image!");
+		}
+		}
 		return files;
 	}
 	@RequestMapping(value = "/get/{value}", method = RequestMethod.GET)
@@ -55,5 +59,16 @@ public class FileController {
 				e.printStackTrace();
 		 }
 	 }
+	public boolean check(String name){
+		String[] parts = name.split("\\.");
+		String ext = parts[parts.length-1];
+		String[] extensions = {"png","jpeg","jpg","bmp","gif"};
+		for(int i=0;i<extensions.length;i++){
+			if(ext.equals(extensions[i]))
+				return true;
+			else return false;
+		}
+		return false;
+	}
 
 }
