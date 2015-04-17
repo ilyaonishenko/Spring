@@ -4,17 +4,11 @@
 <meta charset="utf-8">
 <title>My Uploadings</title>
 <script src="js/jquery.1.9.1.min.js"></script>
-
 <script src="js/vendor/jquery.ui.widget.js"></script>
 <script src="js/jquery.iframe-transport.js"></script>
 <script src="js/jquery.fileupload.js"></script>
-
-<!-- bootstrap just to have good looking page -->
 <script src="bootstrap/js/bootstrap.min.js"></script>
 <link href="bootstrap/css/bootstrap.css" type="text/css" rel="stylesheet" />
-
-<!-- we code these -->
-<!--<link href="css/dropzone.css" type="text/css" rel="stylesheet" />-->
 <script src="js/myuploadfunction.js"></script>
 <style type="text/css">
 	body {
@@ -23,7 +17,7 @@
 	#dropzone {
 		max-width: 700px;
 		margin: 0 auto;
-		min-height: 100px;
+		min-height: 111px;
 		overflow: auto;
 		border: solid 1px black;
 	}
@@ -66,9 +60,9 @@ GRACHEV HUY
 	<input id="fileupload" onchange="processFiles(this.files)" type="file" name="files[]" data-url="rest/controller/upload" multiple>
 	</div>
 </div>
-<div id="progress" class="progress">
+<!--<div id="progress" class="progress">
 	<div class="bar" style="width: 0%;"></div>
-</div>
+</div>-->
 </form>
 <script>
 	function deleteImage(e){
@@ -87,15 +81,23 @@ GRACHEV HUY
 		$.each(files, function(){
 			var reader = new FileReader();
 			reader.onload = function (e) {
-				var tile = $("<div class='tile'><div class='image-container'></div></div>");
+				var tile = $("<div class='tile'><div class='image-container'><div id='progress' class='progress'><div class='bar' style='width:0%;'></div></div></div></div>");
 				$("#dropzone").append(tile);
-				setTimeout(function(){
+				/*setTimeout(function(){
 					var img = $("<img src='" + e.target.result + "'/>");
 					$(".image-container", tile)
 						.append(img)
 						.append("<span onClick='deleteImage(this)' data-uuid='" + Math.random() + "' class='delete-button'>X</span>");
 					img.addClass(img.width() / img.height() > 1 ? 'landscape' : 'portrait');
-				}, Math.random() * 5000);
+				}, Math.random() * 5000);*/
+				var img = $("<img src='" + e.target.result + "'/>");
+				$(".image-container", tile)
+					.append(img)
+					.append("<span onClick='deleteImage(this)' data-uuid='" + Math.random() + "' class='delete-button'>X</span>");
+				img.addClass(img.width() / img.height() > 1 ? 'landscape' : 'portrait');
+				setTimeout(function(){
+					$(".progress",tile).hide();
+				},Math.random()*1000);
 			}
 			reader.readAsDataURL(this);
 		});
@@ -104,6 +106,7 @@ GRACHEV HUY
 		e.preventDefault();
 		processFiles(e.dataTransfer.files);
 	}
+	//document.getElementById("progress").style.display:'none';
 </script>
 IVANONVA SUKA
 </body>

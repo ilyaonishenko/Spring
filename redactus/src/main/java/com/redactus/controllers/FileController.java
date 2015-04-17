@@ -34,13 +34,12 @@ public class FileController {
 			 fileMeta.setFileType(mpf.getContentType());
 			 try {
 				fileMeta.setBytes(mpf.getBytes());
-				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(mpf.getOriginalFilename()));
+				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream("files/"+mpf.getOriginalFilename()));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			 files.add(fileMeta);
-
 		 }
 		return files;
 	}
