@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.redactus.model.FileMeta;
+import org.apache.commons.io.FilenameUtils;
+import java.io.File;
 @Controller
 @RequestMapping("/controller")
 public class FileController {
@@ -21,44 +24,44 @@ public class FileController {
 	FileMeta fileMeta = null;
 	@RequestMapping(value="/upload", method = RequestMethod.POST)
 	public @ResponseBody LinkedList<FileMeta> upload(MultipartHttpServletRequest request, HttpServletResponse response) {
-		 Iterator<String> itr =  request.getFileNames();
-		 MultipartFile mpf = null;
-		 while(itr.hasNext()){
-			 mpf = request.getFile(itr.next());
+		Iterator<String> itr =  request.getFileNames();
+		MultipartFile mpf = null;
+		while(itr.hasNext()){
+			mpf = request.getFile(itr.next());
 			if(check(mpf.getOriginalFilename())){
-			 System.out.println(mpf.getOriginalFilename() +" uploaded! "+files.size());
-			 if(files.size() >= 10)
-				 files.pop();
-			 fileMeta = new FileMeta();
-			 fileMeta.setFileName(mpf.getOriginalFilename());
-			 fileMeta.setFileSize(mpf.getSize()/1024+" Kb");
-			 fileMeta.setFileType(mpf.getContentType());
-			 try {
-				fileMeta.setBytes(mpf.getBytes());
-				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream("files/"+mpf.getOriginalFilename()));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			 	System.out.println(mpf.getOriginalFilename() +" uploaded! "+files.size());
+			 	if(files.size() >= 10)
+				 	files.pop();
+			 	fileMeta = new FileMeta();
+			 	fileMeta.setFileName(mpf.getOriginalFilename());
+			 	fileMeta.setFileSize(mpf.getSize()/1024+" Kb");
+			 	fileMeta.setFileType(mpf.getContentType());
+			 	try {
+					fileMeta.setBytes(mpf.getBytes());
+					FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream("files/"+mpf.getOriginalFilename()));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			 	files.add(fileMeta);
+		 	} else{
+				System.out.println(mpf.getOriginalFilename()+" is not real image!");
 			}
-			 files.add(fileMeta);
-		 } else{
-			System.out.println(mpf.getOriginalFilename()+" is not real image!");
-		}
 		}
 		return files;
 	}
 	@RequestMapping(value = "/get/{value}", method = RequestMethod.GET)
 	 public void get(HttpServletResponse response,@PathVariable String value){
-		 FileMeta getFile = files.get(Integer.parseInt(value));
-		 try {
+		FileMeta getFile = files.get(Integer.parseInt(value));
+		try {
 			 	response.setContentType(getFile.getFileType());
 			 	response.setHeader("Content-disposition", "attachment; filename=\""+getFile.getFileName()+"\"");
 		        FileCopyUtils.copy(getFile.getBytes(), response.getOutputStream());
-		 }catch (IOException e) {
+		}catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-		 }
-	 }
+		}
+	}
 	public boolean check(String name){
 		String[] parts = name.split("\\.");
 		String ext = parts[parts.length-1];
@@ -66,9 +69,26 @@ public class FileController {
 		for(int i=0;i<extensions.length;i++){
 			if(ext.equals(extensions[i]))
 				return true;
-			else return false;
 		}
 		return false;
 	}
-
+	@RequestMapping(value="/uuid",method = RequestMethod.POST)
+	public void getUuid(@RequestParam(value="uuid") String uuid,@RequestParam(value="name") String name){
+		uuid = parseUuid(uuid);
+		name = parseUuid(name);
+		name = parsePath(name);
+	}
+	public String parseUuid(String text){
+		String newText="";
+		for(int i=0;i<text.length();i++){
+			if(text.charAt(i)!='"'){
+				newText+=text.charAt(i);
+			}
+		}
+		return newText;
+	}
+	public String parsePath(String path){
+		String name = FilenameUtils.getName(path);
+		return name;
+	}
 }

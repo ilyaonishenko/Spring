@@ -5,6 +5,7 @@ public class FileMeta {
 	private String fileName;
 	private String fileSize;
 	private String fileType;
+	private String uuid;
 	private byte[] bytes;
 	public String getFileName() {
 		return fileName;
@@ -29,5 +30,11 @@ public class FileMeta {
 	}
 	public void setBytes(byte[] bytes) {
 		this.bytes = bytes;
+	}
+	public String getUuid(){
+		return this.uuid;
+	}
+	public void setFileUuid(String uuid){
+		this.uuid = uuid;
 	}
 }

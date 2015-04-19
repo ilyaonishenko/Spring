@@ -17,7 +17,7 @@
 	#dropzone {
 		max-width: 700px;
 		margin: 0 auto;
-		min-height: 111px;
+		min-height: 115px;
 		overflow: auto;
 		border: solid 1px black;
 	}
@@ -52,7 +52,6 @@
 </style>
 </head>
 <body>
-GRACHEV HUY
 <form method="POST" enctype="multipart/form-data">
 <div>
 	<div>
@@ -60,30 +59,30 @@ GRACHEV HUY
 	<input id="fileupload" onchange="processFiles(this.files,this.value)" type="file" name="files[]" data-url="rest/controller/upload" multiple>
 	</div>
 </div>
-<!--<div id="progress" class="progress">
-	<div class="bar" style="width: 0%;"></div>
-</div>-->
 </form>
 <script>
 	function getExtension(filename) {
-    var parts = filename.split('.');
-    return parts[parts.length - 1];
-		}
+		try{
+    		var parts = filename.split('.');
+    		return parts[parts.length - 1];}
+		catch(err){}
+	}
 	function isImage(filename) {
-    var ext = getExtension(filename);
-    switch (ext.toLowerCase()) {
-    case 'jpg':
-    case 'gif':
-    case 'bmp':
-    case 'png':
+		try{
+    		var ext = getExtension(filename);
+    		switch (ext.toLowerCase()) {
+    		case 'jpg':
+    		case 'gif':
+    		case 'bmp':
+    		case 'png':
         //etc
-        return true;
-    }
-    return false;
+        	return true;
+    		}
+    		return false;}
+		catch(err){}
 	}
 	function deleteImage(e){
 		var element = $(e);
-
 		console.log(element.data("uuid"));
 		element.closest(".tile").remove();
 	}
@@ -103,13 +102,6 @@ GRACHEV HUY
 			reader.onload = function (e) {
 				var tile = $("<div class='tile'><div class='image-container'><div id='progress' class='progress'><div class='bar' style='width:0%;'></div></div></div></div>");
 				$("#dropzone").append(tile);
-				/*setTimeout(function(){
-					var img = $("<img src='" + e.target.result + "'/>");
-					$(".image-container", tile)
-						.append(img)
-						.append("<span onClick='deleteImage(this)' data-uuid='" + Math.random() + "' class='delete-button'>X</span>");
-					img.addClass(img.width() / img.height() > 1 ? 'landscape' : 'portrait');
-				}, Math.random() * 5000);*/
 				var img = $("<img src='" + e.target.result + "'/>");
 				$(".image-container", tile)
 					.append(img)
@@ -119,14 +111,35 @@ GRACHEV HUY
 					$(".progress",tile).hide();
 				},Math.random()*1000);
 			}
+			files["uuid"] = generateUUID();
+			console.log(Object.keys(files));
+			var uuid = JSON.stringify(files.uuid);
+			console.log(uuid);
 			reader.readAsDataURL(this);
+			$.ajax({
+				url:'rest/controller/uuid',
+				type:'POST',
+				data:{
+					uuid:uuid,
+					name:values
+				}
+			});
 		});
+
 	}
 	function onDrop(e){
 		e.preventDefault();
 		processFiles(e.dataTransfer.files);
 	}
+	function generateUUID() {
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        	var r = (d + Math.random()*16)%16 | 0;
+        	d = Math.floor(d/16);
+        	return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    	});
+    	return uuid;
+	};
 </script>
-IVANONVA SUKA
 </body>
 </html>
