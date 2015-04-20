@@ -1,5 +1,4 @@
 package com.redactus.controllers;
-
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -38,23 +37,50 @@ public class FileController {
 			 	fileMeta.setFileName(mpf.getOriginalFilename());
 			 	fileMeta.setFileSize(mpf.getSize()/1024+" Kb");
 			 	fileMeta.setFileType(mpf.getContentType());
-			 	try {
+				try{
+					fileMeta.setBytes(mpf.getBytes());
+					files.add(fileMeta);
+				} catch(IOException e){
+					System.err.println("IOException");
+				}
+				if(files.size()>1){
+					if(files.getLast().getFileName().equals(lastFileMeta.getFileName())){
+						files.getLast().setFileUuid(lastFileMeta.getUuid());
+					}
+					try{
+						String ext = getExtension(files.getLast().getFileName());
+						FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream("files/"+files.getLast().getUuid()+ext));
+					} catch(IOException e){
+						e.printStackTrace();
+					}
+				}
+				else{
+					try{
+						//fileMeta.setBytes(mpf.getBytes());
+						///files.add(fileMeta);
+						FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream("files/"+mpf.getOriginalFilename()));
+					} catch(IOException e){
+						e.printStackTrace();
+					}
+				}
+			 	/*try {
 					fileMeta.setBytes(mpf.getBytes());
 					FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream("files/"+mpf.getOriginalFilename()));
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			 	files.add(fileMeta);
+			 	files.add(fileMeta);*/
 		 	} else{
 				System.out.println(mpf.getOriginalFilename()+" is not real image!");
 			}
 		}
-		if (files.size()>1){
+		/*if (files.size()>1){
 			if(files.getLast().getFileName().equals(lastFileMeta.getFileName())){
 				files.getLast().setFileUuid(lastFileMeta.getUuid());
+				System.out.println("another file uuid "+lastFileMeta.getUuid());
 			}
-		}
+		}*/
 		return files;
 	}
 	@RequestMapping(value = "/get/{value}", method = RequestMethod.GET)
@@ -92,6 +118,14 @@ public class FileController {
 			System.out.println("____________YES");
 			if(files.get(0).getFileName().equals(name)){
 				files.get(0).setFileUuid(uuid);
+				System.out.println("first file uuid "+uuid);
+				String ext = getExtension(files.get(0).getFileName());
+				File file = new File("files/"+files.get(0).getFileName());
+				File file2 = new File("files/"+files.get(0).getUuid()+ext);
+				boolean suc = file.renameTo(file2);
+				if (suc)
+					System.out.println("suc");
+				else System.out.println("not suc");
 			}
 			else System.out.println("_________NO");
 		}
@@ -103,12 +137,12 @@ public class FileController {
 		int pos = 0;
 		//System.out.println("Size of files "+files.size());
 		for(int i=0;i<files.size();i++){
-			if (files.get(i).getFileName().equals(name)&&files.get(i).getUuid().equals(uuid))
+			if (files.get(i).getUuid().equals(uuid))
 				pos =i;
 		}
 		files.remove(pos);
 		try{
-			File file = new File("files/"+name);
+			File file = new File("files/"+uuid+getExtension(name));
 			FileUtils.forceDelete(file);
 			//if(deleteQuietly(file))
 			//	System.out.println("File deleted "+name);
@@ -130,6 +164,11 @@ public class FileController {
 	public String parsePath(String path){
 		String name = FilenameUtils.getName(path);
 		return name;
+	}
+	public String getExtension(String name){
+		String[] parts = name.split("\\.");
+		String ext="."+parts[parts.length-1];
+		return ext;
 	}
 	@RequestMapping(value="show",method = RequestMethod.GET)
 	public void showALlFiles(){
