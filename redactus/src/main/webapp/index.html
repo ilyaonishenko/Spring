@@ -130,7 +130,9 @@
 	}
 	function onDrop(e){
 		e.preventDefault();
-		processFiles(e.dataTransfer.files);
+		var files = e.dataTransfer.files;
+		console.log(files[files.length-1].name);
+		processFiles(files,files[files.length-1].name);
 	}
 	function generateUUID() {
     var d = new Date().getTime();

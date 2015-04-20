@@ -50,6 +50,7 @@ public class FileController {
 			}
 		}
 		if (files.size()>1){
+			System.out.println("filessize >1");
 			if(files.getLast().getFileName().equals(lastFileMeta.getFileName())){
 				files.getLast().setFileUuid(lastFileMeta.getUuid());
 			}
@@ -80,6 +81,7 @@ public class FileController {
 	}
 	@RequestMapping(value="/uuid",method = RequestMethod.POST)
 	public void getUuid(@RequestParam(value="uuid") String uuid,@RequestParam(value="name") String name){
+		System.out.println("IT's DONE");
 		uuid = parseUuid(uuid);
 		name = parseUuid(name);
 		name = parsePath(name);
