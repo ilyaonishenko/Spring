@@ -22,6 +22,7 @@ import java.io.File;
 public class FileController {
 	LinkedList<FileMeta> files = new LinkedList<FileMeta>();
 	FileMeta fileMeta = null;
+	FileMeta lastFileMeta = null;
 	@RequestMapping(value="/upload", method = RequestMethod.POST)
 	public @ResponseBody LinkedList<FileMeta> upload(MultipartHttpServletRequest request, HttpServletResponse response) {
 		Iterator<String> itr =  request.getFileNames();
@@ -46,6 +47,11 @@ public class FileController {
 			 	files.add(fileMeta);
 		 	} else{
 				System.out.println(mpf.getOriginalFilename()+" is not real image!");
+			}
+		}
+		if (files.size()>1){
+			if(files.getLast().getFileName().equals(lastFileMeta.getFileName())){
+				files.getLast().setFileUuid(lastFileMeta.getUuid());
 			}
 		}
 		return files;
@@ -77,6 +83,23 @@ public class FileController {
 		uuid = parseUuid(uuid);
 		name = parseUuid(name);
 		name = parsePath(name);
+		lastFileMeta = new FileMeta();
+		lastFileMeta.setFileName(name);
+		lastFileMeta.setFileUuid(uuid);
+		if (files.size()==1){
+			System.out.println("____________YES");
+			if(files.get(0).getFileName().equals(name)){
+				files.get(0).setFileUuid(uuid);
+			}
+			else System.out.println("_________NO");
+		}
+		/*System.out.println("\n\n\nUUID "+uuid);
+		System.out.println("Name "+name+"\n\n\n");
+		for(FileMeta fm:files){
+			if(fm.getFileName().equals(name)){
+				fm.setFileUuid(uuid);
+			}
+		}*/
 	}
 	public String parseUuid(String text){
 		String newText="";
@@ -90,5 +113,12 @@ public class FileController {
 	public String parsePath(String path){
 		String name = FilenameUtils.getName(path);
 		return name;
+	}
+	@RequestMapping(value="show",method = RequestMethod.GET)
+	public void showALlFiles(){
+		for(FileMeta fm:files){
+			System.out.println("____FileName "+fm.getFileName());
+			System.out.println("____FileUUID "+fm.getUuid());
+		}
 	}
 }

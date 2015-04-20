@@ -114,6 +114,7 @@
 			files["uuid"] = generateUUID();
 			console.log(Object.keys(files));
 			var uuid = JSON.stringify(files.uuid);
+			console.log(values);
 			console.log(uuid);
 			reader.readAsDataURL(this);
 			$.ajax({
