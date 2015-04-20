@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.redactus.model.FileMeta;
 import org.apache.commons.io.FilenameUtils;
 import java.io.File;
+import org.apache.commons.io.FileUtils;
 @Controller
 @RequestMapping("/controller")
 public class FileController {
@@ -50,7 +51,6 @@ public class FileController {
 			}
 		}
 		if (files.size()>1){
-			System.out.println("filessize >1");
 			if(files.getLast().getFileName().equals(lastFileMeta.getFileName())){
 				files.getLast().setFileUuid(lastFileMeta.getUuid());
 			}
@@ -81,7 +81,7 @@ public class FileController {
 	}
 	@RequestMapping(value="/uuid",method = RequestMethod.POST)
 	public void getUuid(@RequestParam(value="uuid") String uuid,@RequestParam(value="name") String name){
-		System.out.println("IT's DONE");
+		//System.out.println("IT's DONE");
 		uuid = parseUuid(uuid);
 		name = parseUuid(name);
 		name = parsePath(name);
@@ -95,13 +95,28 @@ public class FileController {
 			}
 			else System.out.println("_________NO");
 		}
-		/*System.out.println("\n\n\nUUID "+uuid);
-		System.out.println("Name "+name+"\n\n\n");
-		for(FileMeta fm:files){
-			if(fm.getFileName().equals(name)){
-				fm.setFileUuid(uuid);
-			}
-		}*/
+	}
+	@RequestMapping(value="/delete",method=RequestMethod.POST)
+	public void deleteElement(@RequestParam(value="uuid") String uuid,@RequestParam(value="name") String name){
+		//System.out.println("\n\n\n\nIN DELETING");
+		name = parsePath(name);
+		int pos = 0;
+		//System.out.println("Size of files "+files.size());
+		for(int i=0;i<files.size();i++){
+			if (files.get(i).getFileName().equals(name)&&files.get(i).getUuid().equals(uuid))
+				pos =i;
+		}
+		files.remove(pos);
+		try{
+			File file = new File("files/"+name);
+			FileUtils.forceDelete(file);
+			//if(deleteQuietly(file))
+			//	System.out.println("File deleted "+name);
+			//else System.out.println("File not deleted "+name);
+		}catch(Exception e){
+			System.err.println("Exception");
+		}
+		//System.out.println("Size of files "+files.size());
 	}
 	public String parseUuid(String text){
 		String newText="";

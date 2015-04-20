@@ -84,7 +84,16 @@
 	function deleteImage(e){
 		var element = $(e);
 		console.log(element.data("uuid"));
+		console.log(element.data("name"));
 		element.closest(".tile").remove();
+		$.ajax({
+			url:'rest/controller/delete',
+			type:'POST',
+			data:{
+				uuid:element.data("uuid"),
+				name:element.data("name")
+			}
+		});
 	}
 	function selectFiles(){
 		$("#fileInput").trigger('click');
@@ -99,19 +108,19 @@
 		}
 		$.each(files, function(){
 			var reader = new FileReader();
+			files["uuid"] = generateUUID();
 			reader.onload = function (e) {
 				var tile = $("<div class='tile'><div class='image-container'><div id='progress' class='progress'><div class='bar' style='width:0%;'></div></div></div></div>");
 				$("#dropzone").append(tile);
 				var img = $("<img src='" + e.target.result + "'/>");
 				$(".image-container", tile)
 					.append(img)
-					.append("<span onClick='deleteImage(this)' data-uuid='" + Math.random() + "' class='delete-button'>X</span>");
+					.append("<span onClick='deleteImage(this)'data-name='"+values+"' data-uuid='" + files.uuid + "' class='delete-button'>X</span>");
 				img.addClass(img.width() / img.height() > 1 ? 'landscape' : 'portrait');
 				setTimeout(function(){
 					$(".progress",tile).hide();
 				},Math.random()*1000);
 			}
-			files["uuid"] = generateUUID();
 			console.log(Object.keys(files));
 			var uuid = JSON.stringify(files.uuid);
 			console.log(values);
@@ -126,7 +135,6 @@
 				}
 			});
 		});
-
 	}
 	function onDrop(e){
 		e.preventDefault();
