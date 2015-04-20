@@ -17,9 +17,11 @@ import com.redactus.model.FileMeta;
 import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import org.apache.commons.io.FileUtils;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.ApplicationListener;
 @Controller
 @RequestMapping("/controller")
-public class FileController {
+public class FileController implements ApplicationListener<ContextRefreshedEvent> {
 	LinkedList<FileMeta> files = new LinkedList<FileMeta>();
 	FileMeta fileMeta = null;
 	FileMeta lastFileMeta = null;
@@ -123,9 +125,9 @@ public class FileController {
 				File file = new File("files/"+files.get(0).getFileName());
 				File file2 = new File("files/"+files.get(0).getUuid()+ext);
 				boolean suc = file.renameTo(file2);
-				if (suc)
-					System.out.println("suc");
-				else System.out.println("not suc");
+				// if (suc)
+					// System.out.println("suc");
+				// else System.out.println("not suc");
 			}
 			else System.out.println("_________NO");
 		}
@@ -175,6 +177,19 @@ public class FileController {
 		for(FileMeta fm:files){
 			System.out.println("____FileName "+fm.getFileName());
 			System.out.println("____FileUUID "+fm.getUuid());
+		}
+	}
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+			// do whatever you need to do here when app context is initialized / refreshed
+			init();
+	}
+	public void init(){
+		// System.out.println("\n\n\nI'm here\n\n\n");
+		File f = new File("files/");
+		try{
+			FileUtils.cleanDirectory(f);
+		} catch(IOException e){
+			System.err.println("Clearing directory error");
 		}
 	}
 }
