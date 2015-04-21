@@ -102,44 +102,10 @@
 		e.preventDefault();
 	}
 	function processFiles(files){
-		/*if(isImage(values)===false){
-			alert("Not an image");
-			return 0;
-		}
-		$.each(files, function(){
-			var reader = new FileReader();
-			files["uuid"] = generateUUID();
-			reader.onload = function (e) {
-				var tile = $("<div class='tile'><div class='image-container'><div id='progress' class='progress'><div class='bar' style='width:0%;'></div></div></div></div>");
-				$("#dropzone").append(tile);
-				var img = $("<img src='" + e.target.result + "'/>");
-				$(".image-container", tile)
-					.append(img)
-					.append("<span onClick='deleteImage(this)'data-name='"+values+"' data-uuid='" + files.uuid + "' class='delete-button'>X</span>");
-				img.addClass(img.width() / img.height() > 1 ? 'landscape' : 'portrait');
-				setTimeout(function(){
-					$(".progress",tile).hide();
-				},Math.random()*1000);
-			}
-			console.log(Object.keys(files));
-			var uuid = JSON.stringify(files.uuid);
-			console.log(values);
-			console.log(uuid);
-			reader.readAsDataURL(this);
-			$.ajax({
-				url:'rest/controller/uuid',
-				type:'POST',
-				data:{
-					uuid:uuid,
-					name:values
-				}
-			});
-		});*/
 		for(j=0;j<files.length;j++)
 			files[j].ready=false;
 		for(i=0;i<files.length;i++){
 			if(isImage(files[i].name)===false){
-				// console.log(Object.keys(files[i]));
 				alert("Not an image");
 				return 0;
 			}
@@ -174,33 +140,6 @@
 				},Math.random()*1000);
 			}
 			reader.readAsDataURL(files[i]);
-			/*nFiles = files;
-			for(k=0;k<nFiles.length;k++){
-				if(nFiles[k].ready===false){
-					sendToServer(nFiles[k]);
-					nFiles[k].ready = true;
-					break;
-				}
-			}
-			/*using = files[i];
-			console.log("used name "+using.name);
-			console.log("used uuid "+using.uuid);
-			$.ajax({
-				url:'rest/controller/uuid',
-				type:'POST',
-				data:{
-					uuid:using.uuid,
-					name:using.name
-				},
-				success:function(){
-					console.log(files[i].uuid);
-					console.log(files[i].name);
-				},
-				error:function(){
-					console.log(using.uuid);
-					console.log(using.name);
-				}
-			});*/
 			console.log("sended");
 		}
 	}
