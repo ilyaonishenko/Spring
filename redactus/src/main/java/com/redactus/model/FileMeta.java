@@ -6,6 +6,7 @@ public class FileMeta {
 	private String fileSize;
 	private String fileType;
 	private String uuid;
+	private boolean ready;
 	private byte[] bytes;
 	public String getFileName() {
 		return fileName;

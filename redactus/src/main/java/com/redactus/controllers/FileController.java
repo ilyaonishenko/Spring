@@ -23,8 +23,10 @@ import org.springframework.context.ApplicationListener;
 @RequestMapping("/controller")
 public class FileController implements ApplicationListener<ContextRefreshedEvent> {
 	LinkedList<FileMeta> files = new LinkedList<FileMeta>();
+	LinkedList<FileMeta> files2 = new LinkedList<FileMeta>();
 	FileMeta fileMeta = null;
 	FileMeta lastFileMeta = null;
+	public static boolean ready = true;
 	@RequestMapping(value="/upload", method = RequestMethod.POST)
 	public @ResponseBody LinkedList<FileMeta> upload(MultipartHttpServletRequest request, HttpServletResponse response) {
 		Iterator<String> itr =  request.getFileNames();
@@ -35,6 +37,7 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 			 	System.out.println(mpf.getOriginalFilename() +" uploaded! "+files.size());
 			 	if(files.size() >= 10)
 				 	files.pop();
+
 			 	fileMeta = new FileMeta();
 			 	fileMeta.setFileName(mpf.getOriginalFilename());
 			 	fileMeta.setFileSize(mpf.getSize()/1024+" Kb");
@@ -45,10 +48,28 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 				} catch(IOException e){
 					System.err.println("IOException");
 				}
+				System.out.println("files2 size is "+files2.size());
+				String uuid="";
 				if(files.size()>1){
-					if(files.getLast().getFileName().equals(lastFileMeta.getFileName())){
-						files.getLast().setFileUuid(lastFileMeta.getUuid());
+					for(FileMeta fm:files){
+						for(FileMeta fm2:files2){
+							if(fm.getFileName().equals(fm2.getFileName()))
+							{
+								fm.setFileUuid(fm2.getUuid());
+								uuid = fm2.getUuid();
+								System.out.println(fm.getUuid()+" uuid for "+fm.getFileName());
+							}
+						}
 					}
+					for(int i=0;i<files2.size();i++){
+						if (files2.get(i).getUuid().equals(uuid)){
+							files2.remove(i);
+							break;
+						}
+					}
+					/*if(files.getLast().getFileName().equals(lastFileMeta.getFileName())){
+						files.getLast().setFileUuid(lastFileMeta.getUuid());
+					}*/
 					try{
 						String ext = getExtension(files.getLast().getFileName());
 						FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream("files/"+files.getLast().getUuid()+ext));
@@ -113,9 +134,9 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 		uuid = parseUuid(uuid);
 		name = parseUuid(name);
 		name = parsePath(name);
-		lastFileMeta = new FileMeta();
+		/*lastFileMeta = new FileMeta();
 		lastFileMeta.setFileName(name);
-		lastFileMeta.setFileUuid(uuid);
+		lastFileMeta.setFileUuid(uuid);*/
 		if (files.size()==1){
 			System.out.println("____________YES");
 			if(files.get(0).getFileName().equals(name)){
@@ -129,7 +150,13 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 					// System.out.println("suc");
 				// else System.out.println("not suc");
 			}
-			else System.out.println("_________NO");
+			else{
+				System.out.println("_________NO");
+				FileMeta fm = new FileMeta();
+				fm.setFileName(name);
+				fm.setFileUuid(uuid);
+				files2.add(fm);
+			}
 		}
 	}
 	@RequestMapping(value="/delete",method=RequestMethod.POST)

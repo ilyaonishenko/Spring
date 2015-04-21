@@ -56,7 +56,7 @@
 <div>
 	<div>
 	<div id="dropzone" ondragover="onDragOver(event)" ondrop="onDrop(event)"></div>
-	<input id="fileupload" onchange="processFiles(this.files,this.value)" type="file" name="files[]" data-url="rest/controller/upload" multiple>
+	<input id="fileupload" onchange="processFiles(this.files)" type="file" name="files[]" data-url="rest/controller/upload" multiple>
 	</div>
 </div>
 </form>
@@ -101,8 +101,8 @@
 	function onDragOver(e){
 		e.preventDefault();
 	}
-	function processFiles(files,values){
-		if(isImage(values)===false){
+	function processFiles(files){
+		/*if(isImage(values)===false){
 			alert("Not an image");
 			return 0;
 		}
@@ -134,13 +134,69 @@
 					name:values
 				}
 			});
-		});
+		});*/
+		for(i=0;i<files.length;i++){
+			if(isImage(files[i].name)===false){
+				// console.log(Object.keys(files[i]));
+				alert("Not an image");
+				return 0;
+			}
+			console.log(files[i].name);
+			reader = new FileReader();
+			files[i].uuid = generateUUID();
+			uuid = files[i].uuid;
+			name = files[i].name;
+			for(j=0;j<files.length;j++)
+				files[j].ready=false;
+			files2 = files;
+			/*console.log(files[i].uuid);
+			console.log(Object.keys(files[i]));
+			console.log(files[i].webkitRelativePath);
+			console.log(files[i].size);*/
+			reader.onload = function (e) {
+				var tile = $("<div class='tile'><div class='image-container'><div id='progress' class='progress'><div class='bar' style='width:0%;'></div></div></div></div>");
+				$("#dropzone").append(tile);
+				img = $("<img src='" + e.target.result + "'/>");
+				var ser = null;
+				for(q=0;q<files2.length;q++){
+					console.log(files2[q].ready);
+					if (files2[q].size=e.total&&files2[q].ready===false){
+						ser = files2[q];
+						console.log("i found "+ser.name);
+						files2[q].ready=true;
+						break;
+					}
+				}
+				$(".image-container", tile)
+					.append(img)
+					.append("<span onClick='deleteImage(this)' data-name='"+ser.name+"' data-uuid='" + ser.uuid + "' class='delete-button'>X</span>");
+				img.addClass(img.width() / img.height() > 1 ? 'landscape' : 'portrait');
+				/*console.log(Object.keys(e));
+				console.log(e.total);
+				console.log(e.loaded);
+				console.log(e.returnValue);
+				console.log(e.srcElement);
+				console.log("target result"+e.target.result);*/
+				console.log("done");
+				setTimeout(function(){
+					$(".progress",tile).hide();
+				},Math.random()*1000);
+			}
+				//console.log(Object.keys(files));
+			reader.readAsDataURL(files[i]);
+			$.ajax({
+				url:'rest/controller/uuid',
+				type:'POST',
+				data:{
+					uuid:files[i].uuid,
+					name:files[i].name
+				}
+			});
+		}
 	}
 	function onDrop(e){
 		e.preventDefault();
-		var files = e.dataTransfer.files;
-		console.log(files[files.length-1].name);
-		processFiles(files,files[files.length-1].name);
+		processFiles(e.dataTransfer.files);
 	}
 	function generateUUID() {
     var d = new Date().getTime();
