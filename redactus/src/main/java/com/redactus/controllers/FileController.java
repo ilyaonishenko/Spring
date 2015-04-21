@@ -27,17 +27,24 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 	FileMeta fileMeta = null;
 	FileMeta lastFileMeta = null;
 	public static boolean ready = true;
+	public static boolean firstIter = false;
+	static int counter = 0;
 	@RequestMapping(value="/upload", method = RequestMethod.POST)
-	public @ResponseBody LinkedList<FileMeta> upload(MultipartHttpServletRequest request, HttpServletResponse response) {
+	public synchronized @ResponseBody LinkedList<FileMeta> upload(MultipartHttpServletRequest request, HttpServletResponse response) {
 		Iterator<String> itr =  request.getFileNames();
+		/*while (itr.hasNext()){
+			MultipartFile mf = null;
+			mf = request.getFile(itr.next());
+			System.out.println(mf.getOriginalFilename());
+		}*/
 		MultipartFile mpf = null;
 		while(itr.hasNext()){
 			mpf = request.getFile(itr.next());
+			System.out.println("Name: "+mpf.getOriginalFilename());
 			if(check(mpf.getOriginalFilename())){
 			 	System.out.println(mpf.getOriginalFilename() +" uploaded! "+files.size());
 			 	if(files.size() >= 10)
 				 	files.pop();
-
 			 	fileMeta = new FileMeta();
 			 	fileMeta.setFileName(mpf.getOriginalFilename());
 			 	fileMeta.setFileSize(mpf.getSize()/1024+" Kb");
@@ -49,8 +56,14 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 					System.err.println("IOException");
 				}
 				System.out.println("files2 size is "+files2.size());
+				System.out.println("files size is "+files.size());
 				String uuid="";
-				if(files.size()>1){
+				try{
+					FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream("files/"+mpf.getOriginalFilename()));
+				} catch(IOException e){
+					e.printStackTrace();
+				}
+				/*if(files.size()>1){
 					for(FileMeta fm:files){
 						for(FileMeta fm2:files2){
 							if(fm.getFileName().equals(fm2.getFileName()))
@@ -70,7 +83,7 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 					/*if(files.getLast().getFileName().equals(lastFileMeta.getFileName())){
 						files.getLast().setFileUuid(lastFileMeta.getUuid());
 					}*/
-					try{
+					/*try{
 						String ext = getExtension(files.getLast().getFileName());
 						FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream("files/"+files.getLast().getUuid()+ext));
 					} catch(IOException e){
@@ -78,6 +91,8 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 					}
 				}
 				else{
+					firstIter = true;
+					System.out.println("first Iter is "+firstIter);
 					try{
 						//fileMeta.setBytes(mpf.getBytes());
 						///files.add(fileMeta);
@@ -129,17 +144,34 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 		return false;
 	}
 	@RequestMapping(value="/uuid",method = RequestMethod.POST)
-	public void getUuid(@RequestParam(value="uuid") String uuid,@RequestParam(value="name") String name){
+	public synchronized void getUuid(@RequestParam(value="uuid") String uuid,@RequestParam(value="name") String name){
 		//System.out.println("IT's DONE");
+		System.out.println("counter is "+counter);
 		uuid = parseUuid(uuid);
 		name = parseUuid(name);
 		name = parsePath(name);
+		System.out.println("name "+name);
+		System.out.println("uuid "+uuid);
+		for(FileMeta fm:files){
+			if (fm.getFileName().equals(name)){
+				fm.setFileUuid(uuid);
+				String ext = getExtension(fm.getFileName());
+				File file = new File("files/"+fm.getFileName());
+				File file2 = new File("files/"+fm.getUuid()+ext);
+				boolean suc = file.renameTo(file2);
+			}
+		}
 		/*lastFileMeta = new FileMeta();
 		lastFileMeta.setFileName(name);
 		lastFileMeta.setFileUuid(uuid);*/
-		if (files.size()==1){
+		/*System.out.println("files size "+files.size());
+		if (counter<=files.size()-1){
 			System.out.println("____________YES");
-			if(files.get(0).getFileName().equals(name)){
+			System.out.println("What now in files");
+			for(FileMeta fm:files){
+				System.out.println(fm.getFileName());
+			}
+			/*if(files.get(0).getFileName().equals(name)){
 				files.get(0).setFileUuid(uuid);
 				System.out.println("first file uuid "+uuid);
 				String ext = getExtension(files.get(0).getFileName());
@@ -149,15 +181,40 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 				// if (suc)
 					// System.out.println("suc");
 				// else System.out.println("not suc");
+			}*/
+			/*System.out.println(files.get(counter).getFileName()+" is name we have");
+			System.out.println(name+" is name we need");
+			if(files.get(counter).getFileName().equals(name)){
+				files.get(counter).setFileUuid(uuid);
+				System.out.println("__________YES2");
+				System.out.println(counter+" file uuid "+uuid);
+				String ext = getExtension(files.get(counter).getFileName());
+				File file = new File("files/"+files.get(counter).getFileName());
+				File file2 = new File("files/"+files.get(counter).getUuid()+ext);
+				boolean suc = file.renameTo(file2);
+			}*/
+			/*for(int i=0;i<files.size();i++){
+				if(files.get(i).getFileName().equals(name)){
+					files.get(i).setFileUuid(uuid);
+					System.out.println("__________YES2");
+					System.out.println(i+" file uuid "+uuid);
+					System.out.println("filename "+files.get(i).getFileName());
+					System.out.println("uuid "+files.get(i).getUuid());
+					String ext = getExtension(files.get(i).getFileName());
+					File file = new File("files/"+files.get(i).getFileName());
+					File file2 = new File("files/"+files.get(i).getUuid()+ext);
+					boolean suc = file.renameTo(file2);
+				}
 			}
+		}
 			else{
 				System.out.println("_________NO");
 				FileMeta fm = new FileMeta();
 				fm.setFileName(name);
 				fm.setFileUuid(uuid);
 				files2.add(fm);
-			}
-		}
+			}*/
+			// counter++;
 	}
 	@RequestMapping(value="/delete",method=RequestMethod.POST)
 	public void deleteElement(@RequestParam(value="uuid") String uuid,@RequestParam(value="name") String name){
@@ -207,11 +264,6 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 		}
 	}
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-			// do whatever you need to do here when app context is initialized / refreshed
-			init();
-	}
-	public void init(){
-		// System.out.println("\n\n\nI'm here\n\n\n");
 		File f = new File("files/");
 		try{
 			FileUtils.cleanDirectory(f);

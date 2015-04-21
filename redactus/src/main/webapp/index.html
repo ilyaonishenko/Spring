@@ -135,6 +135,8 @@
 				}
 			});
 		});*/
+		for(j=0;j<files.length;j++)
+			files[j].ready=false;
 		for(i=0;i<files.length;i++){
 			if(isImage(files[i].name)===false){
 				// console.log(Object.keys(files[i]));
@@ -146,13 +148,9 @@
 			files[i].uuid = generateUUID();
 			uuid = files[i].uuid;
 			name = files[i].name;
-			for(j=0;j<files.length;j++)
-				files[j].ready=false;
 			files2 = files;
-			/*console.log(files[i].uuid);
-			console.log(Object.keys(files[i]));
-			console.log(files[i].webkitRelativePath);
-			console.log(files[i].size);*/
+			for(q=0;q<files2.length;q++)
+				console.log(files2[q].ready);
 			reader.onload = function (e) {
 				var tile = $("<div class='tile'><div class='image-container'><div id='progress' class='progress'><div class='bar' style='width:0%;'></div></div></div></div>");
 				$("#dropzone").append(tile);
@@ -162,8 +160,8 @@
 					console.log(files2[q].ready);
 					if (files2[q].size=e.total&&files2[q].ready===false){
 						ser = files2[q];
-						console.log("i found "+ser.name);
 						files2[q].ready=true;
+						sendToServer(files2[q]);
 						break;
 					}
 				}
@@ -171,28 +169,58 @@
 					.append(img)
 					.append("<span onClick='deleteImage(this)' data-name='"+ser.name+"' data-uuid='" + ser.uuid + "' class='delete-button'>X</span>");
 				img.addClass(img.width() / img.height() > 1 ? 'landscape' : 'portrait');
-				/*console.log(Object.keys(e));
-				console.log(e.total);
-				console.log(e.loaded);
-				console.log(e.returnValue);
-				console.log(e.srcElement);
-				console.log("target result"+e.target.result);*/
-				console.log("done");
 				setTimeout(function(){
 					$(".progress",tile).hide();
 				},Math.random()*1000);
 			}
-				//console.log(Object.keys(files));
 			reader.readAsDataURL(files[i]);
+			/*nFiles = files;
+			for(k=0;k<nFiles.length;k++){
+				if(nFiles[k].ready===false){
+					sendToServer(nFiles[k]);
+					nFiles[k].ready = true;
+					break;
+				}
+			}
+			/*using = files[i];
+			console.log("used name "+using.name);
+			console.log("used uuid "+using.uuid);
 			$.ajax({
 				url:'rest/controller/uuid',
 				type:'POST',
 				data:{
-					uuid:files[i].uuid,
-					name:files[i].name
+					uuid:using.uuid,
+					name:using.name
+				},
+				success:function(){
+					console.log(files[i].uuid);
+					console.log(files[i].name);
+				},
+				error:function(){
+					console.log(using.uuid);
+					console.log(using.name);
 				}
-			});
+			});*/
+			console.log("sended");
 		}
+	}
+	function sendToServer(file){
+		$.ajax({
+			url:'rest/controller/uuid',
+			type:'POST',
+			data:{
+				uuid:file.uuid,
+				name:file.name
+			},
+			success:function(){
+				console.log(file.uuid);
+				console.log(file.name);
+			},
+			error:function(){
+				console.log(file.uuid);
+				console.log(file.name);
+			}
+		});
 	}
 	function onDrop(e){
 		e.preventDefault();
