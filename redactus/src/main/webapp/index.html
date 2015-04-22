@@ -115,16 +115,13 @@
 			uuid = files[i].uuid;
 			name = files[i].name;
 			files2 = files;
-			for(q=0;q<files2.length;q++)
-				console.log(files2[q].ready);
 			reader.onload = function (e) {
 				var tile = $("<div class='tile'><div class='image-container'><div id='progress' class='progress'><div class='bar' style='width:0%;'></div></div></div></div>");
 				$("#dropzone").append(tile);
 				img = $("<img src='" + e.target.result + "'/>");
 				var ser = null;
 				for(q=0;q<files2.length;q++){
-					console.log(files2[q].ready);
-					if (files2[q].size=e.total&&files2[q].ready===false){
+					if (files2[q].size===e.total&&files2[q].ready===false){
 						ser = files2[q];
 						files2[q].ready=true;
 						sendToServer(files2[q]);
@@ -140,7 +137,6 @@
 				},Math.random()*1000);
 			}
 			reader.readAsDataURL(files[i]);
-			console.log("sended");
 		}
 	}
 	function sendToServer(file){
@@ -150,14 +146,6 @@
 			data:{
 				uuid:file.uuid,
 				name:file.name
-			},
-			success:function(){
-				console.log(file.uuid);
-				console.log(file.name);
-			},
-			error:function(){
-				console.log(file.uuid);
-				console.log(file.name);
 			}
 		});
 	}

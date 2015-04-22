@@ -113,31 +113,13 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 		fm.setFileUuid(uuid);
 		files2.add(fm);
 		checking();
-		/*if (counter<files.size()){
-			for(FileMeta fm:files){
-				if (fm.getFileName().equals(name)){
-					fm.setFileUuid(uuid);
-					String ext = getExtension(fm.getFileName());
-					File file = new File("files/"+fm.getFileName());
-					File file2 = new File("files/"+fm.getUuid()+ext);
-					boolean suc = file.renameTo(file2);
-				}
-			}
-		}
-		else {
-			FileMeta fm = new FileMeta();
-			fm.setFileName(name);
-			fm.setFileUuid(uuid);
-			files2.add(fm);
-		}
-		counter++;*/
 	}
 	@RequestMapping(value="/delete",method=RequestMethod.POST)
 	public void deleteElement(@RequestParam(value="uuid") String uuid,@RequestParam(value="name") String name){
 		name = parsePath(name);
 		int pos = 0;
 		for(int i=0;i<files.size();i++){
-			if (files.get(i).getUuid().equals(uuid))
+			if (files.get(i).getUuid().equals(uuid)&&files.get(i).getFileName().equals(name))
 				pos =i;
 		}
 		files.remove(pos);
