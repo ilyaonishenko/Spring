@@ -23,8 +23,10 @@ import org.springframework.context.ApplicationListener;
 @RequestMapping("/controller")
 public class FileController implements ApplicationListener<ContextRefreshedEvent> {
 	LinkedList<FileMeta> files = new LinkedList<FileMeta>();
+	LinkedList<FileMeta> files2 = new LinkedList<FileMeta>();
 	FileMeta fileMeta = null;
 	public static boolean ready = true;
+	public static int counter = 0;
 	@RequestMapping(value="/upload", method = RequestMethod.POST)
 	public synchronized @ResponseBody LinkedList<FileMeta> upload(MultipartHttpServletRequest request, HttpServletResponse response) {
 		Iterator<String> itr =  request.getFileNames();
@@ -53,6 +55,7 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 				} catch(IOException e){
 					e.printStackTrace();
 				}
+				checking();
 		 	} else{
 				System.out.println(mpf.getOriginalFilename()+" is not real image!");
 			}
@@ -71,6 +74,17 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 				e.printStackTrace();
 		}
 	}
+	public void checking(){
+		for(FileMeta fm:files){
+			for(FileMeta fm2:files2){
+				if(fm.getFileName().equals(fm2.getFileName())&&fm.getUuid()==null){
+					System.out.println("we have problems");
+					fm.setFileUuid(fm2.getUuid());
+					changeFiles(fm2.getFileName(),fm2.getUuid());
+				}
+			}
+		}
+	}
 	public boolean check(String name){
 		String[] parts = name.split("\\.");
 		String ext = parts[parts.length-1];
@@ -81,6 +95,12 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 		}
 		return false;
 	}
+	public void changeFiles(String name,String uuid){
+		String ext = getExtension(name);
+		File file = new File("files/"+name);
+		File file2 = new File("files/"+uuid+ext);
+		boolean suc = file.renameTo(file2);
+	}
 	@RequestMapping(value="/uuid",method = RequestMethod.POST)
 	public synchronized void getUuid(@RequestParam(value="uuid") String uuid,@RequestParam(value="name") String name){
 		uuid = parseUuid(uuid);
@@ -88,15 +108,29 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 		name = parsePath(name);
 		System.out.println("name "+name);
 		System.out.println("uuid "+uuid);
-		for(FileMeta fm:files){
-			if (fm.getFileName().equals(name)){
-				fm.setFileUuid(uuid);
-				String ext = getExtension(fm.getFileName());
-				File file = new File("files/"+fm.getFileName());
-				File file2 = new File("files/"+fm.getUuid()+ext);
-				boolean suc = file.renameTo(file2);
+		FileMeta fm = new FileMeta();
+		fm.setFileName(name);
+		fm.setFileUuid(uuid);
+		files2.add(fm);
+		checking();
+		/*if (counter<files.size()){
+			for(FileMeta fm:files){
+				if (fm.getFileName().equals(name)){
+					fm.setFileUuid(uuid);
+					String ext = getExtension(fm.getFileName());
+					File file = new File("files/"+fm.getFileName());
+					File file2 = new File("files/"+fm.getUuid()+ext);
+					boolean suc = file.renameTo(file2);
+				}
 			}
 		}
+		else {
+			FileMeta fm = new FileMeta();
+			fm.setFileName(name);
+			fm.setFileUuid(uuid);
+			files2.add(fm);
+		}
+		counter++;*/
 	}
 	@RequestMapping(value="/delete",method=RequestMethod.POST)
 	public void deleteElement(@RequestParam(value="uuid") String uuid,@RequestParam(value="name") String name){
