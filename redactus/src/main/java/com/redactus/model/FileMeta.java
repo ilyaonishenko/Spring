@@ -1,13 +1,26 @@
 package com.redactus.model;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import java.io.Serializable;
 @JsonIgnoreProperties({"bytes"})
-public class FileMeta {
+@Document(collection = FileMeta.COLLECTION_NAME)
+public class FileMeta implements Serializable {
+	public static final String COLLECTION_NAME = "newFiles";
+	@Id
+    private Long id;
 	private String fileName;
 	private String fileSize;
 	private String fileType;
 	private String uuid;
 	private boolean ready;
 	private byte[] bytes;
+	public void setId(Long id) {
+        this.id = id;
+    }
+	public Long getId() {
+        return id;
+    }
 	public String getFileName() {
 		return fileName;
 	}
@@ -37,5 +50,11 @@ public class FileMeta {
 	}
 	public void setFileUuid(String uuid){
 		this.uuid = uuid;
+	}
+	@Override
+	public String toString(){
+		return String.format(
+			"FileName:'%s', UUID:'%s' ",
+			fileName,uuid);
 	}
 }

@@ -19,9 +19,26 @@ import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.ApplicationListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.data.mongodb.gridfs.GridFsOperations;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import com.redactus.services.FileMetaService;
 @Controller
 @RequestMapping("/controller")
 public class FileController implements ApplicationListener<ContextRefreshedEvent> {
+	@Autowired private FileMetaService fileMetaService;
 	LinkedList<FileMeta> files = new LinkedList<FileMeta>();
 	LinkedList<FileMeta> files2 = new LinkedList<FileMeta>();
 	FileMeta fileMeta = null;
@@ -81,6 +98,24 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 					System.out.println("we have problems");
 					fm.setFileUuid(fm2.getUuid());
 					changeFiles(fm2.getFileName(),fm2.getUuid());
+					//adding in mongodb
+					// metaData = new BasicDBObject();
+					/*metaData.put(fm.getFileName(),fm.getUuid());
+					try{
+						inputStream = new FileInputStream("files/"+fm.getUuid()+getExtension(fm.getFileName()));
+						gridOperations.store(inputStream,fm.getUuid(),"image/png",metaData);
+					} catch(FileNotFoundException e){
+						e.printStackTrace();
+					} finally {
+						if(inputStream!=null){
+							try{
+								inputStream.close();
+							} catch(IOException e){
+								e.printStackTrace();
+							}
+						}
+					}
+					System.out.println("something done");*/
 				}
 			}
 		}

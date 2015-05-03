@@ -1,0 +1,167 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>My Uploadings</title>
+<script src="js/jquery.1.9.1.min.js"></script>
+<script src="js/vendor/jquery.ui.widget.js"></script>
+<script src="js/jquery.iframe-transport.js"></script>
+<script src="js/jquery.fileupload.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<link href="bootstrap/css/bootstrap.css" type="text/css" rel="stylesheet" />
+<script src="js/myuploadfunction.js"></script>
+<style type="text/css">
+	body {
+		text-align: center;
+	}
+	#dropzone {
+		max-width: 700px;
+		margin: 0 auto;
+		min-height: 115px;
+		overflow: auto;
+		border: solid 1px black;
+	}
+	.tile {
+		width: 100px;
+		height: 100px;
+		float: left;
+		padding: 5px;
+	}
+	.image-container {
+		border: solid 1px black;
+		width: 100%;
+		height: 100%;
+		position: relative;
+	}
+	.portrait {
+		height: 100%;
+	}
+
+	.landscape {
+		width: 100%;
+	}
+	.delete-button {
+		position: absolute;
+		top: 2px;
+		right: 2px;
+		cursor: pointer;
+	}
+	#file {
+		display: none;
+	}
+</style>
+</head>
+<body>
+<form method="POST" enctype="multipart/form-data">
+<div>
+	<div>
+	<div id="dropzone" ondragover="onDragOver(event)" ondrop="onDrop(event)"></div>
+	<input id="fileupload" onchange="processFiles(this.files)" type="file" name="files[]" data-url="rest/controller/upload" multiple>
+	</div>
+</div>
+</form>
+<script>
+	function getExtension(filename) {
+		try{
+    		var parts = filename.split('.');
+    		return parts[parts.length - 1];}
+		catch(err){}
+	}
+	function isImage(filename) {
+		try{
+    		var ext = getExtension(filename);
+    		switch (ext.toLowerCase()) {
+    		case 'jpg':
+    		case 'gif':
+    		case 'bmp':
+    		case 'png':
+        //etc
+        	return true;
+    		}
+    		return false;}
+		catch(err){}
+	}
+	function deleteImage(e){
+		var element = $(e);
+		console.log(element.data("uuid"));
+		console.log(element.data("name"));
+		element.closest(".tile").remove();
+		$.ajax({
+			url:'rest/controller/delete',
+			type:'POST',
+			data:{
+				uuid:element.data("uuid"),
+				name:element.data("name")
+			}
+		});
+	}
+	function selectFiles(){
+		$("#fileInput").trigger('click');
+	}
+	function onDragOver(e){
+		e.preventDefault();
+	}
+	function processFiles(files){
+		for(j=0;j<files.length;j++)
+			files[j].ready=false;
+		for(i=0;i<files.length;i++){
+			if(isImage(files[i].name)===false){
+				alert("Not an image");
+				return 0;
+			}
+			console.log(files[i].name);
+			reader = new FileReader();
+			files[i].uuid = generateUUID();
+			uuid = files[i].uuid;
+			name = files[i].name;
+			files2 = files;
+			reader.onload = function (e) {
+				var tile = $("<div class='tile'><div class='image-container'><div id='progress' class='progress'><div class='bar' style='width:0%;'></div></div></div></div>");
+				$("#dropzone").append(tile);
+				img = $("<img src='" + e.target.result + "'/>");
+				var ser = null;
+				for(q=0;q<files2.length;q++){
+					if (files2[q].size===e.total&&files2[q].ready===false){
+						ser = files2[q];
+						files2[q].ready=true;
+						sendToServer(files2[q]);
+						break;
+					}
+				}
+				$(".image-container", tile)
+					.append(img)
+					.append("<span onClick='deleteImage(this)' data-name='"+ser.name+"' data-uuid='" + ser.uuid + "' class='delete-button'>X</span>");
+				img.addClass(img.width() / img.height() > 1 ? 'landscape' : 'portrait');
+				setTimeout(function(){
+					$(".progress",tile).hide();
+				},Math.random()*1000);
+			}
+			reader.readAsDataURL(files[i]);
+		}
+	}
+	function sendToServer(file){
+		$.ajax({
+			url:'rest/controller/uuid',
+			type:'POST',
+			data:{
+				uuid:file.uuid,
+				name:file.name
+			}
+		});
+	}
+	function onDrop(e){
+		e.preventDefault();
+		processFiles(e.dataTransfer.files);
+	}
+	function generateUUID() {
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        	var r = (d + Math.random()*16)%16 | 0;
+        	d = Math.floor(d/16);
+        	return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    	});
+    	return uuid;
+	};
+</script>
+</body>
+</html>
