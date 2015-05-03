@@ -6,7 +6,7 @@ import java.io.Serializable;
 @JsonIgnoreProperties({"bytes"})
 @Document(collection = FileMeta.COLLECTION_NAME)
 public class FileMeta implements Serializable {
-	public static final String COLLECTION_NAME = "newFiles";
+	public static final String COLLECTION_NAME = "contacts";
 	@Id
     private Long id;
 	private String fileName;

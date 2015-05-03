@@ -16,15 +16,12 @@ public class FileMetaService{
 	public void update(FileMeta fileMeta) {
         fileMetaDao.save(fileMeta);
     }
-
     public FileMeta get(Long id) {
         return fileMetaDao.get(id);
     }
-
     public List<FileMeta> getAll() {
         return fileMetaDao.getAll();
     }
-
     public void remove(Long id) {
         fileMetaDao.remove(id);
     }

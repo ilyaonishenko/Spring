@@ -99,23 +99,9 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 					fm.setFileUuid(fm2.getUuid());
 					changeFiles(fm2.getFileName(),fm2.getUuid());
 					//adding in mongodb
-					// metaData = new BasicDBObject();
-					/*metaData.put(fm.getFileName(),fm.getUuid());
-					try{
-						inputStream = new FileInputStream("files/"+fm.getUuid()+getExtension(fm.getFileName()));
-						gridOperations.store(inputStream,fm.getUuid(),"image/png",metaData);
-					} catch(FileNotFoundException e){
-						e.printStackTrace();
-					} finally {
-						if(inputStream!=null){
-							try{
-								inputStream.close();
-							} catch(IOException e){
-								e.printStackTrace();
-							}
-						}
-					}
-					System.out.println("something done");*/
+					if(fm.getId()==null)
+						fileMetaService.add(fm);
+					else fileMetaService.update(fm);
 				}
 			}
 		}
