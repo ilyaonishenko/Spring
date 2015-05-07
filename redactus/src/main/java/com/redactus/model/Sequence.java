@@ -2,12 +2,6 @@ package com.redactus.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-/**
- * Date: 26.03.2014
- * Time: 15:38
- *
- * @author Ruslan Molchanov (ruslanys@gmail.com)
- */
 @Document(collection = Sequence.COLLECTION_NAME)
 public class Sequence {
     public static final String COLLECTION_NAME = "sequences";
