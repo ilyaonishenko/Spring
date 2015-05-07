@@ -1,8 +1,9 @@
-com/redactus/model/Sequence.class
 com/redactus/controllers/FileController.class
+com/redactus/manager/FileManager.class
 com/redactus/dao/FileMetaDao.class
 com/redactus/model/FileMeta.class
 Loader.class
 com/redactus/dao/SequenceDao.class
+com/redactus/model/Sequence.class
 com/redactus/exceptions/SequenceException.class
 com/redactus/services/FileMetaService.class

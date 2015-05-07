@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.redactus.model.FileMeta;
 import com.redactus.services.FileMetaService;
+import com.redactus.manager.FileManager;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.FileUtils;
@@ -45,7 +46,7 @@ import com.mongodb.DBObject;
 
 @Controller
 @RequestMapping("/controller")
-public class FileController implements ApplicationListener<ContextRefreshedEvent> {
+public class FileController implements ApplicationListener<ContextRefreshedEvent>,FileManager {
 	@Autowired private FileMetaService fileMetaService;
 	LinkedList<FileMeta> files = new LinkedList<FileMeta>();
 	LinkedList<FileMeta> files2 = new LinkedList<FileMeta>();
