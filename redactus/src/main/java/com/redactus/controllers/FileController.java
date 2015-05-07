@@ -1,9 +1,18 @@
 package com.redactus.controllers;
+
 import java.io.IOException;
+import java.io.FileOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.io.FileOutputStream;
+
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,30 +20,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import com.redactus.model.FileMeta;
-import org.apache.commons.io.FilenameUtils;
-import java.io.File;
-import org.apache.commons.io.FileUtils;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.ApplicationListener;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.data.mongodb.gridfs.GridFsOperations;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.data.mongodb.gridfs.GridFsOperations;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.redactus.model.FileMeta;
 import com.redactus.services.FileMetaService;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.FileUtils;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
 @Controller
 @RequestMapping("/controller")
 public class FileController implements ApplicationListener<ContextRefreshedEvent> {
@@ -106,6 +114,10 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 					if(fm.getId()==null)
 						fileMetaService.add(fm);
 					else fileMetaService.update(fm);
+					//  Провека работае ли получение файлов из ФС
+					// FileMeta fil = new FileMeta();
+					// fil = fileMetaService.get(fm.getUuid());
+					// System.out.println(fil);
 				}
 			}
 		}
