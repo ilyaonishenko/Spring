@@ -91,6 +91,10 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 				e.printStackTrace();
 		}
 	}
+	@RequestMapping(value="/doit", method = RequestMethod.POST)
+	public void doIt(){
+
+	}
 	public void checking(){
 		for(FileMeta fm:files){
 			for(FileMeta fm2:files2){
@@ -143,6 +147,7 @@ public class FileController implements ApplicationListener<ContextRefreshedEvent
 			if (files.get(i).getUuid().equals(uuid)&&files.get(i).getFileName().equals(name))
 				pos =i;
 		}
+		fileMetaService.remove(files.get(pos));
 		files.remove(pos);
 		try{
 			File file = new File("files/"+uuid+getExtension(name));
